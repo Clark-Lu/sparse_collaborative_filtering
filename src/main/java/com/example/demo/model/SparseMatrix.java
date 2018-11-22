@@ -11,20 +11,20 @@ public class SparseMatrix {
 
     private List<String> attributeNameList;
 
-    private final List<List<SparseMatrixElement>> matrix;
+    private final List<SparseMatrixElement> matrix;
 
     private final int length;
 
     private final int size;
 
-    public SparseMatrix(List<String> attributeNameList, List<List<SparseMatrixElement>> matrix) {
+    public SparseMatrix(List<String> attributeNameList, List<SparseMatrixElement> matrix) {
         this.attributeNameList = attributeNameList;
         this.matrix = matrix;
         this.length = matrix.size();
         this.size = attributeNameList.size();
     }
 
-    public SparseMatrix(List<List<SparseMatrixElement>> matrix, int length, int size) {
+    public SparseMatrix(List<SparseMatrixElement> matrix, int length, int size) {
         this.matrix = matrix;
         this.length = length;
         this.size = size;
@@ -34,7 +34,7 @@ public class SparseMatrix {
         return attributeNameList;
     }
 
-    public List<List<SparseMatrixElement>> getMatrix() {
+    public List<SparseMatrixElement> getMatrix() {
         return matrix;
     }
 

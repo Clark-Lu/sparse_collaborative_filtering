@@ -43,7 +43,7 @@ public class SparseCollabrotiveFilterSolver {
     }
 
     //非标准梯度下降法，后续参数的计算利用本次迭代中的值计算
-    private static void refreshParams(List<List<SparseMatrixElement>> sparseList, double[][] theta, double[][] x) {
+    private static void refreshParams(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         for (int i = 0; i < theta.length; i++) {
             for (int j = 0; j < theta[i].length; j++) {
                 theta[i][j] = theta[i][j] - 0.0001 * calculateDerivative(sparseList, theta, x, i, j);
@@ -57,55 +57,50 @@ public class SparseCollabrotiveFilterSolver {
     }
 
 
-    private static double calculateErrorFunction(List<List<SparseMatrixElement>> sparseList, double[][] theta, double[][] x) {
+    private static double calculateErrorFunction(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         double result = 0;
-        for (List<SparseMatrixElement> list : sparseList) {
-            for (SparseMatrixElement element : list) {
-                double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
-                result = result + temp * temp;
-            }
+        for (SparseMatrixElement element : sparseList) {
+            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            result = result + temp * temp;
         }
         return result;
     }
 
-    private static double calculateDerivative(List<List<SparseMatrixElement>> sparseList, double[][] theta, double[][] x, int i, int j) {
+    private static double calculateDerivative(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
         double deltaTheta = 0.0001;
         double deltaError = 0;
         double error = 0;
         double alterError = 0;
-        for (List<SparseMatrixElement> list : sparseList) {
-            for (SparseMatrixElement element : list) {
-                double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
-                error = error + temp * temp;
-                if (element.getJ() == i) {
-                    double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
-                            - (theta[element.getJ()][j] - deltaTheta) * x[element.getI()][j];
-                    alterError = alterError + alterTemp * alterTemp;
-                } else {
-                    alterError = alterError + temp * temp;
-                }
+
+        for (SparseMatrixElement element : sparseList) {
+            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            error = error + temp * temp;
+            if (element.getJ() == i) {
+                double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
+                        - (theta[element.getJ()][j] - deltaTheta) * x[element.getI()][j];
+                alterError = alterError + alterTemp * alterTemp;
+            } else {
+                alterError = alterError + temp * temp;
             }
         }
         deltaError = error - alterError;
         return deltaError / deltaTheta;
     }
 
-    private static double calculateDerivativeX(List<List<SparseMatrixElement>> sparseList, double[][] theta, double[][] x, int i, int j) {
+    private static double calculateDerivativeX(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
         double deltaX = 0.000001;
         double deltaError = 0;
         double error = 0;
         double alterError = 0;
-        for (List<SparseMatrixElement> list : sparseList) {
-            for (SparseMatrixElement element : list) {
-                double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
-                error = error + temp * temp;
-                if (element.getI() == i) {
-                    double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
-                            - (x[element.getI()][j] - deltaX) * theta[element.getJ()][j];
-                    alterError = alterError + alterTemp * alterTemp;
-                } else {
-                    alterError = alterError + temp * temp;
-                }
+        for (SparseMatrixElement element : sparseList) {
+            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            error = error + temp * temp;
+            if (element.getI() == i) {
+                double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
+                        - (x[element.getI()][j] - deltaX) * theta[element.getJ()][j];
+                alterError = alterError + alterTemp * alterTemp;
+            } else {
+                alterError = alterError + temp * temp;
             }
         }
         deltaError = error - alterError;
