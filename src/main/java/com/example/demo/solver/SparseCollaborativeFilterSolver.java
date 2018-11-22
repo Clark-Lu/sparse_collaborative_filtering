@@ -3,7 +3,7 @@ package com.example.demo.solver;
 import com.example.demo.model.Matrix;
 import com.example.demo.model.SparseMatrix;
 import com.example.demo.model.SparseMatrixElement;
-import com.example.demo.result.SparseCollabrotiveFilterResult;
+import com.example.demo.result.SparseCollaborativeFilterResult;
 import com.example.demo.util.CsvReader;
 import com.example.demo.util.DataUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,11 +16,11 @@ import java.util.List;
  *created by LuChang
  *2018/11/21 09:49
  */
-public class SparseCollabrotiveFilterSolver {
+public class SparseCollaborativeFilterSolver {
 
 
     public static void main(String[] args) throws JsonProcessingException {
-        SparseCollabrotiveFilterResult solve = solve(CsvReader.getFormatData("test.csv"), 2);
+        SparseCollaborativeFilterResult solve = solve(CsvReader.getFormatData("test.csv"), 2);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         /**
@@ -45,7 +45,7 @@ public class SparseCollabrotiveFilterSolver {
     }
 
 
-    public static SparseCollabrotiveFilterResult solve(SparseMatrix sparseMatrix, int featureNum) {
+    public static SparseCollaborativeFilterResult solve(SparseMatrix sparseMatrix, int featureNum) {
         double[][] theta = DataUtil.getRandomArray(sparseMatrix.getSize(), featureNum);
         double[][] x = DataUtil.getRandomArray(sparseMatrix.getLength(), featureNum);
         double error = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
@@ -57,7 +57,7 @@ public class SparseCollabrotiveFilterSolver {
             System.out.println(error);
             error = newError;
         }
-        return new SparseCollabrotiveFilterResult(new Matrix(null, theta), new Matrix(null, x));
+        return new SparseCollaborativeFilterResult(new Matrix(null, theta), new Matrix(null, x));
     }
 
     //非标准梯度下降法，后续参数的计算利用本次迭代中的值计算，根据数据量及数据数值大小调整学习率

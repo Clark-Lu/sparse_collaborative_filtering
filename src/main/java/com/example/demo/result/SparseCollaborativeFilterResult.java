@@ -6,7 +6,7 @@ import com.example.demo.model.Matrix;
  *created by LuChang
  *2018/11/21 09:59
  */
-public class SparseCollabrotiveFilterResult {
+public class SparseCollaborativeFilterResult {
 
 
     private Matrix theta;
@@ -14,7 +14,7 @@ public class SparseCollabrotiveFilterResult {
 
     private Matrix x;
 
-    public SparseCollabrotiveFilterResult(Matrix theta, Matrix x) {
+    public SparseCollaborativeFilterResult(Matrix theta, Matrix x) {
         this.theta = theta;
         this.x = x;
     }
