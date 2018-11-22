@@ -20,7 +20,7 @@ public class SparseCollabrotiveFilterSolver {
 
 
     public static void main(String[] args) throws JsonProcessingException {
-        SparseCollabrotiveFilterResult solve = solve(CsvReader.getFormatData(), 2);
+        SparseCollabrotiveFilterResult solve = solve(CsvReader.getFormatData("test.csv"), 2);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
         /**
@@ -45,9 +45,9 @@ public class SparseCollabrotiveFilterSolver {
     }
 
 
-    public static SparseCollabrotiveFilterResult solve(SparseMatrix sparseMatrix, int thetaNum) {
-        double[][] theta = DataUtil.getRandomArray(sparseMatrix.getSize(), thetaNum);
-        double[][] x = DataUtil.getRandomArray(sparseMatrix.getLength(), thetaNum);
+    public static SparseCollabrotiveFilterResult solve(SparseMatrix sparseMatrix, int featureNum) {
+        double[][] theta = DataUtil.getRandomArray(sparseMatrix.getSize(), featureNum);
+        double[][] x = DataUtil.getRandomArray(sparseMatrix.getLength(), featureNum);
         double error = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
         double errorRate = 1;
         while (errorRate > 0.00001) {
@@ -60,7 +60,7 @@ public class SparseCollabrotiveFilterSolver {
         return new SparseCollabrotiveFilterResult(new Matrix(null, theta), new Matrix(null, x));
     }
 
-    //非标准梯度下降法，后续参数的计算利用本次迭代中的值计算
+    //非标准梯度下降法，后续参数的计算利用本次迭代中的值计算，根据数据量及数据数值大小调整学习率
     private static void refreshParams(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         for (int i = 0; i < theta.length; i++) {
             for (int j = 0; j < theta[i].length; j++) {
@@ -78,7 +78,7 @@ public class SparseCollabrotiveFilterSolver {
     private static double calculateErrorFunction(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         double result = 0;
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
             result = result + temp * temp;
         }
         return result;
@@ -91,7 +91,7 @@ public class SparseCollabrotiveFilterSolver {
         double alterError = 0;
 
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
             error = error + temp * temp;
             if (element.getJ() == i) {
                 double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
@@ -111,7 +111,7 @@ public class SparseCollabrotiveFilterSolver {
         double error = 0;
         double alterError = 0;
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - calculateDotMultiple(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
             error = error + temp * temp;
             if (element.getI() == i) {
                 double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
@@ -125,12 +125,5 @@ public class SparseCollabrotiveFilterSolver {
         return deltaError / deltaX;
     }
 
-    private static double calculateDotMultiple(double[] x, double[] y) {
-        double result = 0;
-        for (int i = 0; i < x.length; i++) {
-            result = result + x[i] * y[i];
-        }
-        return result;
-    }
 
 }

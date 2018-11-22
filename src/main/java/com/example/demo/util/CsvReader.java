@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
  */
 public class CsvReader {
 
-    public static List<CsvData> readData() {
+    public static List<CsvData> readData(String fileName) {
         List<CsvData> data = new ArrayList<>();
         try {
-            File file = ResourceUtils.getFile("classpath:test.csv");
+            File file = ResourceUtils.getFile("classpath:" + fileName);
             BufferedReader reader = new BufferedReader(new FileReader(file));
             reader.readLine();
             String line = null;
@@ -51,8 +51,8 @@ public class CsvReader {
         return new SparseMatrix(matrix,rows,cols);
     }
 
-    public static SparseMatrix getFormatData() {
-        return formatData(readData());
+    public static SparseMatrix getFormatData(String fileName) {
+        return formatData(readData(fileName));
     }
 
 
