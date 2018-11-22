@@ -23,8 +23,8 @@ public class DataUtil {
     }
 
 
-    public static double[][] getRandomArray(int length,int size){
-        double[][] result = new double[length][size];
+    public static double[][] getRandomArray(int rowNum,int colNum){
+        double[][] result = new double[rowNum][colNum];
         for (int i = 0; i < result.length; i++) {
             for (int j = 0; j < result[i].length; j++) {
                 result[i][j] = Math.random();
