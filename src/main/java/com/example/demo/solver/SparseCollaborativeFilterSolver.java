@@ -54,7 +54,7 @@ public class SparseCollaborativeFilterSolver {
             refreshParams(sparseMatrix.getMatrix(), theta, x);
             double newError = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
             errorRate = Math.abs((newError - error) / error);
-            System.out.println(error);
+            System.out.println("error = " + error);
             error = newError;
         }
         return new SparseCollaborativeFilterResult(new Matrix(null, theta), new Matrix(null, x));
