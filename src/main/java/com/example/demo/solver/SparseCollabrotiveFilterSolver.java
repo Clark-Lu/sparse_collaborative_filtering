@@ -23,7 +23,25 @@ public class SparseCollabrotiveFilterSolver {
         SparseCollabrotiveFilterResult solve = solve(CsvReader.getFormatData(), 2);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        /**
+         * 得分矩阵
+         *       user1  user2  user3  user4  user5
+         * movie1  1      0     1       0      1
+         * movie2  ?      0     1       0      1
+         * movie3  0      1     0       ?      0
+         * movie4  ?      1     0       1      0
+         *
+         * 求解结果近似
+         *       user1  user2  user3  user4  user5
+         * movie1  1      0     1       0      1
+         * movie2  1      0     1       0      1
+         * movie3  0      1     0       1      0
+         * movie4  0      1     0       1      0
+         *
+         */
         System.out.println(objectMapper.writeValueAsString(solve.getX().multiplyTransfer(solve.getTheta()).getMatrix()));
+        System.out.println("X: " + objectMapper.writeValueAsString(solve.getX()));
+        System.out.println("theta: " + objectMapper.writeValueAsString(solve.getTheta()));
     }
 
 
