@@ -58,7 +58,7 @@ public class CsvReader {
                     list.add(new SparseMatrixElement(i, j, 1));
                 } else {
                     //只有user1对商品2没有评价，但根据喜欢商品1的大都喜欢商品2这个事实，最终计算结果user1对商品2的评分会比较高
-                    if (i != 1 && j != 0)
+                    if (i != 1 || j != 0)
                         list.add(new SparseMatrixElement(i, j, 0));
                 }
             }
