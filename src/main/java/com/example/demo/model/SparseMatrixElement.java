@@ -6,24 +6,24 @@ package com.example.demo.model;
  */
 public class SparseMatrixElement {
 
-    private final int i;
+    private final int row;
 
-    private final int j;
+    private final int col;
 
     private final double value;
 
-    public SparseMatrixElement(int i,int j,double value){
-        this.i = i;
-        this.j = j;
+    public SparseMatrixElement(int row,int col,double value){
+        this.row = row;
+        this.col = col;
         this.value = value;
     }
 
-    public int getI() {
-        return i;
+    public int getRow() {
+        return row;
     }
 
-    public int getJ() {
-        return j;
+    public int getCol() {
+        return col;
     }
 
     public double getValue() {

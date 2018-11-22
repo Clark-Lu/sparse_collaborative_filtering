@@ -46,8 +46,8 @@ public class SparseCollaborativeFilterSolver {
 
 
     public static SparseCollaborativeFilterResult solve(SparseMatrix sparseMatrix, int featureNum) {
-        double[][] theta = DataUtil.getRandomArray(sparseMatrix.getSize(), featureNum);
-        double[][] x = DataUtil.getRandomArray(sparseMatrix.getLength(), featureNum);
+        double[][] theta = DataUtil.getRandomArray(sparseMatrix.getColNum(), featureNum);
+        double[][] x = DataUtil.getRandomArray(sparseMatrix.getRowNum(), featureNum);
         double error = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
         double errorRate = 1;
         while (errorRate > 0.00001) {
@@ -64,7 +64,7 @@ public class SparseCollaborativeFilterSolver {
     private static void refreshParams(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         for (int i = 0; i < theta.length; i++) {
             for (int j = 0; j < theta[i].length; j++) {
-                theta[i][j] = theta[i][j] - 0.0001 * calculateDerivative(sparseList, theta, x, i, j);
+                theta[i][j] = theta[i][j] - 0.0001 * calculateDerivativeTheta(sparseList, theta, x, i, j);
             }
         }
         for (int i = 0; i < x.length; i++) {
@@ -78,24 +78,24 @@ public class SparseCollaborativeFilterSolver {
     private static double calculateErrorFunction(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
         double result = 0;
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
             result = result + temp * temp;
         }
         return result;
     }
 
-    private static double calculateDerivative(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
+    private static double calculateDerivativeTheta(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
         double deltaTheta = 0.0001;
         double deltaError = 0;
         double error = 0;
         double alterError = 0;
 
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
             error = error + temp * temp;
-            if (element.getJ() == i) {
-                double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
-                        - (theta[element.getJ()][j] - deltaTheta) * x[element.getI()][j];
+            if (element.getCol() == i) {
+                double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
+                        - (theta[element.getCol()][j] - deltaTheta) * x[element.getRow()][j];
                 alterError = alterError + alterTemp * alterTemp;
             } else {
                 alterError = alterError + temp * temp;
@@ -111,11 +111,11 @@ public class SparseCollaborativeFilterSolver {
         double error = 0;
         double alterError = 0;
         for (SparseMatrixElement element : sparseList) {
-            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getJ()], x[element.getI()]);
+            double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
             error = error + temp * temp;
-            if (element.getI() == i) {
-                double alterTemp = temp + theta[element.getJ()][j] * x[element.getI()][j]
-                        - (x[element.getI()][j] - deltaX) * theta[element.getJ()][j];
+            if (element.getRow() == i) {
+                double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
+                        - (x[element.getRow()][j] - deltaX) * theta[element.getCol()][j];
                 alterError = alterError + alterTemp * alterTemp;
             } else {
                 alterError = alterError + temp * temp;

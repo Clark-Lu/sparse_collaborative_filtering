@@ -13,21 +13,21 @@ public class SparseMatrix {
 
     private final List<SparseMatrixElement> matrix;
 
-    private final int length;
+    private final int rowNum;
 
-    private final int size;
+    private final int colNum;
 
     public SparseMatrix(List<String> attributeNameList, List<SparseMatrixElement> matrix) {
         this.attributeNameList = attributeNameList;
         this.matrix = matrix;
-        this.length = matrix.size();
-        this.size = attributeNameList.size();
+        this.rowNum = matrix.size();
+        this.colNum = attributeNameList.size();
     }
 
     public SparseMatrix(List<SparseMatrixElement> matrix, int length, int size) {
         this.matrix = matrix;
-        this.length = length;
-        this.size = size;
+        this.rowNum = length;
+        this.colNum = size;
     }
 
     public List<String> getAttributeNameList() {
@@ -38,11 +38,11 @@ public class SparseMatrix {
         return matrix;
     }
 
-    public int getLength() {
-        return length;
+    public int getRowNum() {
+        return rowNum;
     }
 
-    public int getSize() {
-        return size;
+    public int getColNum() {
+        return colNum;
     }
 }
