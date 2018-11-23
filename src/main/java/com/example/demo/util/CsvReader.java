@@ -59,15 +59,19 @@ public class CsvReader {
             BufferedReader reader = new BufferedReader(new FileReader(file));
             reader.readLine();
             String line = null;
-            List<Long> idList = new ArrayList<>();
-            List<Long> userIdList = new ArrayList<>();
+            List<Long> distinctIdList = new ArrayList<>();
+            List<Long> distinctUserIdList = new ArrayList<>();
             Map<Long,List<Long>> relationMap = new HashMap<>();
             while ((line = reader.readLine()) != null) {
                 String[] temp = line.split(",");
                 Long id = Long.valueOf(temp[0]);
                 Long userId = Long.valueOf(temp[1]);
-                idList.add(id);
-                userIdList.add(userId);
+                if (!distinctIdList.contains(id)){
+                    distinctIdList.add(id);
+                }
+                if (!distinctUserIdList.contains(userId)) {
+                    distinctUserIdList.add(userId);
+                }
                 if (relationMap.containsKey(id)){
                     relationMap.get(id).add(userId);
                 }else {
@@ -76,8 +80,6 @@ public class CsvReader {
                     relationMap.put(id,tempList);
                 }
             }
-            List<Long> distinctIdList = idList.stream().distinct().collect(Collectors.toList());
-            List<Long> distinctUserIdList = userIdList.stream().distinct().collect(Collectors.toList());
             double[][] matrix = new double[distinctIdList.size()][distinctUserIdList.size()];
             for (int i = 0; i < distinctIdList.size(); i++) {
                 for (int j = 0; j < distinctUserIdList.size(); j++) {
