@@ -15,6 +15,10 @@ public class RecommendServiceTest extends BaseTest {
     @Autowired
     private RecommendService recommendService;
 
+    /**
+     * 靠前的大部分都应该是各位数是1的记录
+     * @throws JsonProcessingException
+     */
     @Test
     public void testRecommend() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
