@@ -9,14 +9,21 @@ import com.example.demo.util.DataUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /*
  *created by LuChang
  *2018/11/21 09:49
  */
 public class SparseCollaborativeFilterSolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(SparseCollaborativeFilterSolver.class);
 
 
     public static void main(String[] args) throws JsonProcessingException {
@@ -50,27 +57,59 @@ public class SparseCollaborativeFilterSolver {
         double[][] x = DataUtil.getRandomArray(sparseMatrix.getRowNum(), featureNum);
         double error = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
         double errorRate = 1;
-        while (errorRate > 0.00001) {
-            refreshParams(sparseMatrix.getMatrix(), theta, x);
+        int times = 0;
+        logger.info("初始误差为{}", error);
+        List<SparseMatrixElement> sparseMatrixElementList = sparseMatrix.getMatrix();
+        Map<Integer, List<SparseMatrixElement>> rowIndexMap = new HashMap<>(sparseMatrix.getRowNum());
+        Map<Integer, List<SparseMatrixElement>> colIndexMap = new HashMap<>(sparseMatrix.getColNum());
+        for (int i = 0; i < sparseMatrix.getRowNum(); i++) {
+            rowIndexMap.put(i, new ArrayList<>(200));
+        }
+        for (int i = 0; i < sparseMatrix.getColNum(); i++) {
+            colIndexMap.put(i, new ArrayList<>(20));
+        }
+        for (int i = 0; i < sparseMatrixElementList.size(); i++) {
+            SparseMatrixElement sparseMatrixElement = sparseMatrixElementList.get(i);
+            rowIndexMap.get(sparseMatrixElement.getRow()).add(sparseMatrixElement);
+            colIndexMap.get(sparseMatrixElement.getCol()).add(sparseMatrixElement);
+        }
+        double minErrorRate = 0.0001;
+        while (errorRate > minErrorRate && times < 1000) {
+            refreshParams(rowIndexMap, colIndexMap, theta, x);
             double newError = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
             errorRate = Math.abs((newError - error) / error);
-            System.out.println("error = " + error);
             error = newError;
+            times++;
+            logger.info("第{}次迭代，误差率变化为{}，误差为{}", times, errorRate, error);
         }
         return new SparseCollaborativeFilterResult(new Matrix(null, theta), new Matrix(null, x));
     }
 
     //非标准梯度下降法，后续参数的计算利用本次迭代中的值计算，根据数据量及数据数值大小调整学习率
-    private static void refreshParams(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x) {
+    private static void refreshParams(Map<Integer, List<SparseMatrixElement>> rowIndexMap,
+                                      Map<Integer, List<SparseMatrixElement>> colIndexMap,
+                                      double[][] theta, double[][] x) {
         for (int i = 0; i < theta.length; i++) {
             for (int j = 0; j < theta[i].length; j++) {
-                theta[i][j] = theta[i][j] - 0.0001 * calculateDerivativeTheta(sparseList, theta, x, i, j);
+                double derivative = calculateDerivativeTheta(colIndexMap, theta, x, i, j);
+                double relative = Math.abs(derivative / theta[i][j]);
+                refreshParam(theta, i, j, derivative, relative);
             }
         }
         for (int i = 0; i < x.length; i++) {
             for (int j = 0; j < x[i].length; j++) {
-                x[i][j] = x[i][j] - 0.0001 * calculateDerivativeX(sparseList, theta, x, i, j);
+                double derivative = calculateDerivativeX(rowIndexMap, theta, x, i, j);
+                double relative = Math.abs(derivative / x[i][j]);
+                refreshParam(x, i, j, derivative, relative);
             }
+        }
+    }
+
+    private static void refreshParam(double[][] param, int i, int j, double derivative, double relative) {
+        if (relative > 1) {
+            param[i][j] = param[i][j] - param[i][j] * derivative / Math.abs(relative);
+        }else {
+            param[i][j] = param[i][j] - 0.1* derivative;
         }
     }
 
@@ -84,44 +123,27 @@ public class SparseCollaborativeFilterSolver {
         return result;
     }
 
-    private static double calculateDerivativeTheta(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
+    private static double calculateDerivativeTheta(Map<Integer, List<SparseMatrixElement>> colIndexMap, double[][] theta, double[][] x, int i, int j) {
         double deltaTheta = 0.0001;
         double deltaError = 0;
-        double error = 0;
-        double alterError = 0;
-
-        for (SparseMatrixElement element : sparseList) {
+        for (SparseMatrixElement element : colIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
-            error = error + temp * temp;
-            if (element.getCol() == i) {
-                double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
-                        - (theta[element.getCol()][j] - deltaTheta) * x[element.getRow()][j];
-                alterError = alterError + alterTemp * alterTemp;
-            } else {
-                alterError = alterError + temp * temp;
-            }
+            double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
+                    - (theta[element.getCol()][j] - deltaTheta) * x[element.getRow()][j];
+            deltaError = deltaError + temp * temp - alterTemp * alterTemp;
         }
-        deltaError = error - alterError;
         return deltaError / deltaTheta;
     }
 
-    private static double calculateDerivativeX(List<SparseMatrixElement> sparseList, double[][] theta, double[][] x, int i, int j) {
-        double deltaX = 0.000001;
+    private static double calculateDerivativeX(Map<Integer, List<SparseMatrixElement>> rowIndexMap, double[][] theta, double[][] x, int i, int j) {
+        double deltaX = 0.0001;
         double deltaError = 0;
-        double error = 0;
-        double alterError = 0;
-        for (SparseMatrixElement element : sparseList) {
+        for (SparseMatrixElement element : rowIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
-            error = error + temp * temp;
-            if (element.getRow() == i) {
-                double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
-                        - (x[element.getRow()][j] - deltaX) * theta[element.getCol()][j];
-                alterError = alterError + alterTemp * alterTemp;
-            } else {
-                alterError = alterError + temp * temp;
-            }
+            double alterTemp = temp + theta[element.getCol()][j] * x[element.getRow()][j]
+                    - (x[element.getRow()][j] - deltaX) * theta[element.getCol()][j];
+            deltaError = deltaError + temp * temp - alterTemp * alterTemp;
         }
-        deltaError = error - alterError;
         return deltaError / deltaX;
     }
 
