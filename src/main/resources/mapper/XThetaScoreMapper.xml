@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.XThetaScoreMapper">
+
+    <select id="selectAll" resultType="com.example.demo.model.XThetaScore">
+        SELECT * FROM cf_x_theta_score
+    </select>
+
+    <select id="selectByXIdAndThetaId" resultType="com.example.demo.model.XThetaScore">
+        SELECT * FROM cf_x_theta_score WHERE x_id = #{xId} AND theta_id = #{thetaId}
+    </select>
+
+    <update id="updateByXIdAndThetaId" parameterType="com.example.demo.model.XThetaScore">
+        UPDATE cf_x_theta_score SET
+        score = #{score}
+        WHERE x_id = #{xId} AND theta_id = #{thetaId}
+    </update>
+
+    <insert id="batchInsert">
+        INSERT INTO cf_x_theta_score
+        (
+             x_id
+            ,theta_id
+            ,score
+        )
+        VALUES
+        <foreach collection="xThetaScoreList" item="item" separator=",">
+            (
+                 #{item.xId}
+                ,#{item.thetaId}
+                ,#{item.score}
+            )
+        </foreach>
+    </insert>
+</mapper>

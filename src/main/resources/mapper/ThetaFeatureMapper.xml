@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.mapper.ThetaFeatureMapper">
+
+    <select id="selectByPrimaryKey" resultType="com.example.demo.model.Feature">
+        SELECT * FROM cf_theta_feature WHERE id = #{id}
+    </select>
+
+    <insert id="batchInsertSelective">
+        INSERT INTO cf_theta_feature
+        (
+             id
+            ,feature0
+            ,feature1
+            ,feature2
+            ,feature3
+            ,feature4
+            ,feature5
+            ,feature6
+            ,feature7
+            ,feature8
+            ,feature9
+            ,feature10
+            ,feature11
+            ,feature12
+            ,feature13
+            ,feature14
+            ,feature15
+            ,feature16
+            ,feature17
+            ,feature18
+            ,feature19
+        )
+        VALUES
+        <foreach collection="featureList" separator="," item="feature">
+            (
+             IFNULL(#{feature.id},0)
+            ,IFNULL(#{feature.feature0},  0)
+            ,IFNULL(#{feature.feature1},  0)
+            ,IFNULL(#{feature.feature2},  0)
+            ,IFNULL(#{feature.feature3},  0)
+            ,IFNULL(#{feature.feature4},  0)
+            ,IFNULL(#{feature.feature5},  0)
+            ,IFNULL(#{feature.feature6},  0)
+            ,IFNULL(#{feature.feature7},  0)
+            ,IFNULL(#{feature.feature8},  0)
+            ,IFNULL(#{feature.feature9},  0)
+            ,IFNULL(#{feature.feature10}, 0)
+            ,IFNULL(#{feature.feature11}, 0)
+            ,IFNULL(#{feature.feature12}, 0)
+            ,IFNULL(#{feature.feature13}, 0)
+            ,IFNULL(#{feature.feature14}, 0)
+            ,IFNULL(#{feature.feature15}, 0)
+            ,IFNULL(#{feature.feature16}, 0)
+            ,IFNULL(#{feature.feature17}, 0)
+            ,IFNULL(#{feature.feature18}, 0)
+            ,IFNULL(#{feature.feature19}, 0)
+            )
+        </foreach>
+    </insert>
+    
+    <update id="updateByPrimaryKey" parameterType="com.example.demo.model.Feature">
+        UPDATE cf_theta_feature SET
+             feature0  = #{feature0}
+            ,feature1  = #{feature1}
+            ,feature2  = #{feature2}
+            ,feature3  = #{feature3}
+            ,feature4  = #{feature4}
+            ,feature5  = #{feature5}
+            ,feature6  = #{feature6}
+            ,feature7  = #{feature7}
+            ,feature8  = #{feature8}
+            ,feature9  = #{feature9}
+            ,feature10 = #{feature10}
+            ,feature11 = #{feature11}
+            ,feature12 = #{feature12}
+            ,feature13 = #{feature13}
+            ,feature14 = #{feature14}
+            ,feature15 = #{feature15}
+            ,feature16 = #{feature16}
+            ,feature17 = #{feature17}
+            ,feature18 = #{feature18}
+            ,feature19 = #{feature19}
+        WHERE id = #{id}
+    </update>
+
+    <select id="selectAll" resultType="com.example.demo.model.Feature">
+        select * FROM cf_theta_feature
+    </select>
+
+</mapper>

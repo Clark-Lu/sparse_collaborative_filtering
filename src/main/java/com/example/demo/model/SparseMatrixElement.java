@@ -10,7 +10,7 @@ public class SparseMatrixElement {
 
     private final int col;
 
-    private final double value;
+    private  double value;
 
     public SparseMatrixElement(int row,int col,double value){
         this.row = row;
@@ -28,5 +28,9 @@ public class SparseMatrixElement {
 
     public double getValue() {
         return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 }

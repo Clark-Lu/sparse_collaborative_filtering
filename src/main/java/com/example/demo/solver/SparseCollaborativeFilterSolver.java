@@ -73,8 +73,9 @@ public class SparseCollaborativeFilterSolver {
             rowIndexMap.get(sparseMatrixElement.getRow()).add(sparseMatrixElement);
             colIndexMap.get(sparseMatrixElement.getCol()).add(sparseMatrixElement);
         }
-        double minErrorRate = 0.0001;
-        while (errorRate > minErrorRate && times < 1000) {
+        double minErrorRate = 0.00001;
+        double minError = 0.00001;
+        while (errorRate > minErrorRate && times < 1000 && error > minError) {
             refreshParams(rowIndexMap, colIndexMap, theta, x);
             double newError = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
             errorRate = Math.abs((newError - error) / error);
@@ -92,25 +93,26 @@ public class SparseCollaborativeFilterSolver {
         for (int i = 0; i < theta.length; i++) {
             for (int j = 0; j < theta[i].length; j++) {
                 double derivative = calculateDerivativeTheta(colIndexMap, theta, x, i, j);
-                double relative = Math.abs(derivative / theta[i][j]);
-                refreshParam(theta, i, j, derivative, relative);
+                refreshParam(theta, i, j, derivative);
             }
         }
         for (int i = 0; i < x.length; i++) {
             for (int j = 0; j < x[i].length; j++) {
                 double derivative = calculateDerivativeX(rowIndexMap, theta, x, i, j);
-                double relative = Math.abs(derivative / x[i][j]);
-                refreshParam(x, i, j, derivative, relative);
+                refreshParam(x, i, j, derivative);
             }
         }
     }
 
-    private static void refreshParam(double[][] param, int i, int j, double derivative, double relative) {
-        if (relative > 1) {
-            param[i][j] = param[i][j] - param[i][j] * derivative / Math.abs(relative);
-        }else {
-            param[i][j] = param[i][j] - 0.1* derivative;
+    //学习率调参直至收敛
+    private static void refreshParam(double[][] param, int i, int j, double derivative) {
+        int k = 0;
+        double temp = 10;
+        while (temp >= 1 || temp <= 0){
+            temp = param[i][j] - derivative/Math.pow(10,k);
+            k++;
         }
+        param[i][j] = param[i][j] - 2*derivative/Math.pow(10,k);
     }
 
 
@@ -124,7 +126,7 @@ public class SparseCollaborativeFilterSolver {
     }
 
     private static double calculateDerivativeTheta(Map<Integer, List<SparseMatrixElement>> colIndexMap, double[][] theta, double[][] x, int i, int j) {
-        double deltaTheta = 0.0001;
+        double deltaTheta = 0.0000001;
         double deltaError = 0;
         for (SparseMatrixElement element : colIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
@@ -136,7 +138,7 @@ public class SparseCollaborativeFilterSolver {
     }
 
     private static double calculateDerivativeX(Map<Integer, List<SparseMatrixElement>> rowIndexMap, double[][] theta, double[][] x, int i, int j) {
-        double deltaX = 0.0001;
+        double deltaX = 0.0000001;
         double deltaError = 0;
         for (SparseMatrixElement element : rowIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
