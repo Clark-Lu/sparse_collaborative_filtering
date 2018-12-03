@@ -49,13 +49,13 @@ public class KMeansClusterSolver {
         for (Integer key : clusters.keySet()){
             List<Integer> rowList = clusters.get(key);
             for (Integer i : rowList){
-                error = error + calcuilateDistance(matrix[i],centroids[key]);
+                error = error + calculateDistance(matrix[i],centroids[key]);
             }
         }
         return error;
     }
 
-    public static double calcuilateDistance(double[] row,double[] centroid){
+    public static double calculateDistance(double[] row, double[] centroid){
         double result = 0;
         for (int j = 0; j < centroid.length; j++) {
             result = result + Math.abs(row[j] - centroid[j]);
@@ -72,7 +72,7 @@ public class KMeansClusterSolver {
             double minError = Integer.MAX_VALUE;
             int centroid = 0;
             for (int j = 0; j < centroids.length; j++) {
-                double distance = calcuilateDistance(matrix[i],centroids[j]);
+                double distance = calculateDistance(matrix[i],centroids[j]);
                 if (minError >distance){
                     minError = distance;
                     centroid = j;
