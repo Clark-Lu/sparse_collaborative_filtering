@@ -36,7 +36,7 @@
         VALUES
         <foreach collection="featureList" separator="," item="feature">
             (
-             IFNULL(#{feature.id},0)
+             #{feature.id}
             ,IFNULL(#{feature.feature0},  0)
             ,IFNULL(#{feature.feature1},  0)
             ,IFNULL(#{feature.feature2},  0)

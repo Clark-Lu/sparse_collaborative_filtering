@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,12 @@ public class SparseCollaborativeFilterSolver {
     }
 
 
+    /**
+     * 空间换时间优化之后100万的数据量误差小于0.00001迭代完成只需5分钟左右，一次迭代只需0.5秒左右
+     * @param sparseMatrix
+     * @param featureNum
+     * @return
+     */
     public static SparseCollaborativeFilterResult solve(SparseMatrix sparseMatrix, int featureNum) {
         double[][] theta = DataUtil.getRandomArray(sparseMatrix.getColNum(), featureNum);
         double[][] x = DataUtil.getRandomArray(sparseMatrix.getRowNum(), featureNum);
@@ -75,13 +82,15 @@ public class SparseCollaborativeFilterSolver {
         }
         double minErrorRate = 0.00001;
         double minError = 0.00001;
-        while (errorRate > minErrorRate && times < 1000 && error > minError) {
+        int maxTimes = 1000;
+        DecimalFormat df = new DecimalFormat("0.0000");
+        while (errorRate > minErrorRate && times < maxTimes && error > minError) {
             refreshParams(rowIndexMap, colIndexMap, theta, x);
             double newError = calculateErrorFunction(sparseMatrix.getMatrix(), theta, x);
             errorRate = Math.abs((newError - error) / error);
             error = newError;
             times++;
-            logger.info("第{}次迭代，误差率变化为{}，误差为{}", times, errorRate, error);
+            logger.info("第{}次迭代，误差率变化为{}，误差为{}", times, df.format(errorRate), error);
         }
         return new SparseCollaborativeFilterResult(new Matrix(null, theta), new Matrix(null, x));
     }
@@ -104,7 +113,7 @@ public class SparseCollaborativeFilterSolver {
         }
     }
 
-    //学习率调参直至收敛
+    //归一化之后所有参数都控制在0-1之间，学习率选取使参数在0-1之间时的值的1/10作为学习率
     private static void refreshParam(double[][] param, int i, int j, double derivative) {
         int k = 0;
         double temp = 10;
@@ -112,7 +121,9 @@ public class SparseCollaborativeFilterSolver {
             temp = param[i][j] - derivative/Math.pow(10,k);
             k++;
         }
-        param[i][j] = param[i][j] - 2*derivative/Math.pow(10,k);
+        param[i][j] = param[i][j] - derivative/Math.pow(10,k);
+//        不取1/10前期收敛速度较快，但是收敛不稳定
+//        param[i][j] = temp;
     }
 
 

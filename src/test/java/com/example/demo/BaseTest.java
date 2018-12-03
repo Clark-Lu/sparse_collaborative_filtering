@@ -25,11 +25,13 @@ public class BaseTest {
     //theta偏好id个位数相同的x
     @Test
     public void initXThetaScore(){
-        for (long i = 1; i <= 10000; i++) {
+        int theta = 10000;
+        int xThetaNum = 100;
+        for (long i = 1; i <= theta; i++) {
             int j = 0;
-            List<XThetaScore> list = new ArrayList<>(20);
-            while (j<100){
-                long xId = (long) (Math.random() * 1000);
+            List<XThetaScore> list = new ArrayList<>(theta);
+            while (j<xThetaNum){
+                long xId = (long) (Math.random() * 1000) + 1;
                 if (xId % 10 == i % 10){
                     XThetaScore xThetaScore = new XThetaScore();
                     xThetaScore.setThetaId(i);
