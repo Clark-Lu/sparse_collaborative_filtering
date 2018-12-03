@@ -137,7 +137,10 @@ public class SparseCollaborativeFilterSolver {
     }
 
     private static double calculateDerivativeTheta(Map<Integer, List<SparseMatrixElement>> colIndexMap, double[][] theta, double[][] x, int i, int j) {
-        double deltaTheta = 0.0000001;
+        double deltaTheta = 0.0001 * theta[i][j];
+        if (deltaTheta == 0){
+            deltaTheta = 0.0000001;
+        }
         double deltaError = 0;
         for (SparseMatrixElement element : colIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
@@ -149,7 +152,10 @@ public class SparseCollaborativeFilterSolver {
     }
 
     private static double calculateDerivativeX(Map<Integer, List<SparseMatrixElement>> rowIndexMap, double[][] theta, double[][] x, int i, int j) {
-        double deltaX = 0.0000001;
+        double deltaX = 0.0001 * x[i][j];
+        if (deltaX == 0){
+            deltaX = 0.0000001;
+        }
         double deltaError = 0;
         for (SparseMatrixElement element : rowIndexMap.get(i)) {
             double temp = element.getValue() - DataUtil.calculateDotMultiply(theta[element.getCol()], x[element.getRow()]);
