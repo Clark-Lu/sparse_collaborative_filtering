@@ -31,7 +31,7 @@
   无实际生产数据的，可以运行BaseTest中的initXThetaScore测试方法，该方法造了10000个用户，与1000个左右商品的数据，用户id的个位数与商品id的个位数相同，
 则表明用户喜欢该商品，否则不喜欢。
    </li>
-  <li>然后运行FeatureUpdateServiceTest中的testUpdateFeature方法，运行完成及模型训练完成，用户特征向量和商品特征向量
+  <li>然后运行FeatureUpdateServiceTest中的testUpdateFeature方法，完成训练。用户特征向量和商品特征向量
 分别存储在cf_theta_feature表和cf_x_feature表中。如想计算某个用户对某个商品的评分，只需计算对应的特征向量点积。
         </li>
         <li>
