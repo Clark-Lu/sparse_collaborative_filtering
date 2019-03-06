@@ -22,7 +22,7 @@ public class RecommendServiceTest extends BaseTest {
     @Test
     public void testRecommend() throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.writeValueAsString(recommendService.recommendList(1L)));
+        System.out.println(objectMapper.writeValueAsString(recommendService.recommendList(2L)));
     }
 
 }
