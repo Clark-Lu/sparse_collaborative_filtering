@@ -16,6 +16,8 @@ public class RegressionSolver {
 
     private double[] a;
 
+    private double trainError;
+
     public RegressionSolver(double[][] xx, double[] y, String formula) {
         this.xx = xx;
         this.y = y;
@@ -29,26 +31,27 @@ public class RegressionSolver {
      */
     public void train(int times,double minError){
         a = DataUtil.getRandomArray(a.length);
-        double error = this.calculateError();
-        System.out.println("init error is " + error);
+        trainError = this.calculateError();
+        System.out.println("init error is " + trainError);
         for (int i = 0; i < times; i++) {
-            refreshParam(error,minError);
-            error = this.calculateError();
+            refreshParam(minError);
+            trainError = this.calculateError();
         }
+        System.out.println("final error is " + trainError);
     }
 
-    private void refreshParam(double lastError,double minError){
+    private void refreshParam(double minError){
         for (int i = 0; i < a.length; i++) {
-            refreshParam(i,lastError,minError);
+            refreshParam(i,minError);
         }
     }
 
-    private void refreshParam(int i,double lastError,double minError){
+    private void refreshParam(int i,double minError){
         double learnRate = 2;
-        double error = lastError + 1;
+        double error = trainError + 1;
         double temp = a[i];
         //自适应学习率
-        while (error >= lastError && error > minError) {
+        while (error >= trainError && error > minError) {
             a[i] = temp;
             a[i] = a[i] - learnRate * calculateDerivative(i);
             error = calculateError();
@@ -79,5 +82,9 @@ public class RegressionSolver {
 
     public double[] getA() {
         return a;
+    }
+
+    public double getTrainError() {
+        return trainError;
     }
 }
