@@ -48,7 +48,7 @@ public class RegressionSolver {
 
     private void refreshParam(int i,double minError){
         double learnRate = 2;
-        double error = trainError + 1;
+        double error = 2 * trainError;
         double temp = a[i];
         //自适应学习率
         while (error >= trainError && error > minError) {
